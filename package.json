@@ -1,0 +1,10 @@
+{
+  "name": "",
+  "version": "",
+  "dependencies": {
+    "casperjs": "^1.1.0-beta5",
+    "cheerio": "^0.20.0",
+    "node-horseman": "^2.8.2",
+    "phantom": "^2.0.10"
+  }
+}
