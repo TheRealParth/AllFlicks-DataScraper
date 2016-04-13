@@ -6,7 +6,6 @@ try {
 var Parse = require('parse/node');
 Parse.initialize("7Ls0qDj0lyybWgspTc7kQcYOdy3FQLjGUBzvibph", "0ObHU53Jl2rmlokTkYSeHYuu0ITApIXIbwaxVXkm");
 // Parse.serverURL = 'http://159.203.108.93:1337/parse';
-var fs = require('fs');
 
 
 var spooky = new Spooky({
@@ -40,9 +39,6 @@ var spooky = new Spooky({
                     var page = this.evaluate(function () {
                         var titles = '[';
                         for(var y = 1; y<document.getElementsByTagName("tr").length; y++){
-                            // titles += { name:  document.getElementsByTagName("tr")[y].children[1].children[0].innerText,
-                            //             image: document.getElementsByTagName("tr")[1].children[0].children[0].href};
-                            // var image = document.getElementsByTagName("tr")[1].children[0].children[0].href;
 
                             titles += '{"name":"' + document.getElementsByTagName("tr")[y].children[1].children[0].innerText + '",';
                             titles += '"image":"' + document.getElementsByTagName("tr")[y].children[0].children[0].children[0].src + '",';
@@ -72,16 +68,9 @@ var spooky = new Spooky({
                         return  JSON.parse(titles);
 
                     });
-                    // if(x>0){
-                    //     page+= ',';
-                    // }
-
                         this.emit('page.done', page);
 
                     });
-
-                    // fs.write('stuff.js', page, 'a');
-                    // this.echo(page, 'INFO');
 
                 });
                 x--;
@@ -103,14 +92,12 @@ spooky.on('write.page', function(page){
 
     fs.writeFileSync('stuff.js', ("x: \n" + page), 'a');
 });
-/*
  // Uncomment this block to see all of the things Casper has to say.
  // There are a lot.
  // He has opinions.
  spooky.on('console', function (line) {
  console.log(line);
  });
- */
 spooky.on('title.done', function(title){
 
 });
@@ -202,25 +189,6 @@ spooky.on('page.done', function (page) {
         newTitle.set('year', page[title].year);
         newTitle.set('dateAdded', new Date(Date.parse(page[title].dateAdded)));
         titleArray.push(newTitle);
-        // while(!setTimeout(function(){
-        //     console.log("waiting");
-        // },100));
-        // var query = new Parse.Query('NetflixTitle');
-        // query.get(obj.id).then(function(objAgain) {
-        //    if(objAgain){
-        //         console.log("already exists");
-        //    }else {
-        //
-        //    };
-        // }, function(err) {
-        //     if(err.code == 101) {
-        //         obj.save().then(function (obj) {
-        //             console.log(obj);
-        //         }, function (err) {
-        //             console.log(err);
-        //         });
-        //     }
-        //     });
 
         console.log(JSON.stringify(page[title]));
     }

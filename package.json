@@ -3,9 +3,7 @@
   "version": "",
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "casperjs": "^1.1.0-beta5",
-    "cheerio": "^0.20.0",
-    "node-horseman": "^2.8.2",
+    "parse": "^1.8.3",
     "phantom": "^2.0.10",
     "spooky": "^0.2.5"
   }
