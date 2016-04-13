@@ -3,21 +3,22 @@ var fs = require('fs');
 var cheerio = require('cheerio');
 var address; //set the random proxy here. add '--proxy=52.90.236.143:8083', '--cookies-file=cookies.txt'
 var email = "psyrotix@gmail.com";
-var password = "lolTroll03";
+var password = "lolTroll04";
 
 
 
 var login = function(email, password) {
-    phantom.create(['--ignore-ssl-errors=yes', '--load-images=no', '--proxy=52.90.236.143:8083', '--cookies-file=cookies.txt']).then(function (ph) {
+    phantom.create(['--ignore-ssl-errors=yes', '--load-images=no', '--proxy=52.90.69.217:8083', '--cookies-file=cookies.txt']).then(function (ph) {
         ph.createPage().then(function (page) {
             var isSuccess=false;
             page.property('onResourceRequested', function (requestData, networkRequest) {
+                console.log(requestData.url);
                 if (requestData.url.indexOf("css") > -1) {
                     networkRequest.abort();
                 }
-                // if (requestData.url.indexOf("facebook") > -1) {
-                //     networkRequest.abort();
-                // }
+                if (requestData.url.indexOf("facebook") > -1) {
+                    networkRequest.abort();
+                }
                 if (requestData.url.indexOf("browse") > -1) {
                     isSuccess = true;
                 }
@@ -26,6 +27,7 @@ var login = function(email, password) {
                 if (isSuccess && (status == 'success')) {
                     for(var i in this.cookies){
                         ph.addCookie(this.cookies[i]);
+                        console.log(this.cookies(i));
                     }
                     page.close();
                     console.log(isSuccess);
@@ -42,7 +44,7 @@ var login = function(email, password) {
                 });
 
             });
-            page.open('https://www.netflix.com/login').then(function (status) {
+            page.open('https://www.netflix.com/login?locale=en-US').then(function (status) {
                 if (status !== 'success') {
                     console.log("failed connection")
                 }
@@ -58,10 +60,10 @@ var login = function(email, password) {
                                 }
 
                         }, email, password, isSuccess);
-
+                    
 
                 }
-                page.render('page.png');
+                
             });
         });
     });
@@ -78,7 +80,7 @@ var getLinks = function(){
                 //     networkRequest.abort();
                 // }
             });
-            var writeToFile = function(data){fs.writeFileSync('./stuff.txt', data);}
+            var writeToFile = function(data){fs.writeFileSync('./stuff.js', data);}
             page.setting('javascriptEnabled', true);
             page.property('viewportSize', {width: 1000, height: 800}).then(function() {
             });
@@ -107,7 +109,7 @@ var getLinks = function(){
                         page.onLoadFinished();
 
                     })
-                    fs.writeFile('stuff.txt', this.content, function(err){
+                    fs.writeFile('stuff.js', this.content, function(err){
                         if (err) throw err;
                         console.log('It\'s saved!');
                     });
@@ -123,3 +125,4 @@ var getLinks = function(){
     });
 }
 login(email,password);
+// getLinks();

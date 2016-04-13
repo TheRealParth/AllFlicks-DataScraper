@@ -6,36 +6,85 @@ var casper = require("casper").create({
         ],
         pageSettings: {
             loadImages: false,        // The WebPage instance used by Casper will
-            loadPlugins: false         // use these settings
+            loadPlugins: true         // use these settings
         },
-        logLevel: "debug",              // Only "info" level messages will be logged
+        logLevel: "info",              // Only "info" level messages will be logged
         verbose: true                  // log messages will be printed out to the console}
     });
 var utils =   require('utils');
 var mouse = require("mouse").create(casper);
-casper.start('http://www.netflix.com/browse',function(){
-    if (this.exists('div.profiles-gate-container')) {
-        this.echo(this.evaluate(function() {
-            document.getElementsByClassName('profile-link')[0].click();
-            return (document.getElementsByClassName('profiles-gate-container').length==0);
-        }), 'INFO'); // Will be printed in green on
-    }
+var fs = require('fs');
+var Parse = require('parse');
+Parse.initialize("7Ls0qDj0lyybWgspTc7kQcYOdy3FQLjGUBzvibph", "0ObHU53Jl2rmlokTkYSeHYuu0ITApIXIbwaxVXkm");
+Parse.serverURL = 'http://159.203.108.93:1337/parse';
+var obj = new Parse.Object('NetflixTitle');
+obj.set('title','test');
+obj.save().then(function(obj) {
+    console.log(obj);
+    var query = new Parse.Query('NetflixTitle');
+    query.get(obj.id).then(function(objAgain) {
+        console.log(objAgain);
+    }, function(err) {console.log(err); });
+}, function(err) { console.log(err); });
 
+
+var titles;
+casper.start('https://www.allflicks.net',function(){
+    var x = this.evaluate(function() {
+            document.getElementsByTagName("th")[5].click();
+            var i = document.getElementsByClassName("paginate_button")[document.getElementsByClassName("paginate_button").length -3].innerText;
+            return parseInt(i);
+        }); // Will be printed in green on
+    casper.then(function(){
+        var pages = [];
+        while(x>0) {
+            this.wait(500, function () {
+                var page = this.evaluate(function () {
+                    var titles = '[';
+                    for(var y = 1; y<$("tr").length; y++){
+                        // titles += { name:  document.getElementsByTagName("tr")[y].children[1].children[0].innerText,
+                        //             image: document.getElementsByTagName("tr")[1].children[0].children[0].href};
+                        // var image = document.getElementsByTagName("tr")[1].children[0].children[0].href;
+
+                        titles += '{"name":"' + document.getElementsByTagName("tr")[y].children[1].children[0].innerText + '",';
+                        titles += '"image":"' + document.getElementsByTagName("tr")[y].children[0].children[0].children[0].src + '",';
+                        titles += '"year":"' + document.getElementsByTagName("tr")[y].children[2].innerText + '",';
+                        titles += '"genre":['
+                        for(var z = 0; z<document.getElementsByTagName("tr")[y].children[3].innerText.split(",").length; z++){
+                            var genre = document.getElementsByTagName("tr")[y].children[3].innerText.split(",")[z];
+                            titles += '"' + genre.replace(/\r?\n|\r/g, '') + '"';
+                            if(z<(document.getElementsByTagName("tr")[y].children[3].innerText.split(",").length-1)){
+                                titles+= ',';
+                            }
+                        }
+                        titles +=  '],';
+                        titles += '"rating":"' + document.getElementsByTagName("tr")[y].children[4].innerText + '",';
+                        titles += '"dateAdded":"' + document.getElementsByTagName("tr")[y].children[5].innerText + '"}';
+                        if(y<($("tr").length-1)){
+                            titles+= ',';
+                        }
+
+                    }
+                    titles += "]";
+
+                    document.getElementsByClassName("paginate_button next")[0].click();
+
+
+                    return  titles;
+
+                });
+                if(x>0){
+                    page+= ',';
+                }
+                fs.write('stuff.js', page, 'a');
+                utils.dump(page);
+
+            });
+            x--;
+        }
+    });
 });
-// this.mouse.move(225,40);
-// this.mouse.click(225,40);
 
-casper.then(function(){
-    if(this.exists('li.browse')){
-        this.echo(
-            this.evaluate(function(){
-                document.getElementsByTagName('a')[1].click();
-                
-                return document.getElementsByClassName('sub-menu-link')[0].innerText;
-        }), 'INFO');
-
-    }
-});
 
 
 casper.run();
